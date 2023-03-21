@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    tools:context=".AdminActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/note_main_text"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Select the note."
+            android:textStyle="bold"
+            android:textSize="32sp"
+            android:textColor="@color/black"
+            />
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/note_main_text"
+        android:id="@+id/hello_text"
+        android:orientation="vertical">
+
+        <Button
+            android:id="@+id/note1_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Note1" />
+
+        <Button
+            android:id="@+id/note2_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Note2" />
+
+        <Button
+            android:id="@+id/note3_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="300dp"
+            android:text="Note3" />
+
+
+    </LinearLayout>
+
+
+
+    <Button
+        android:id="@+id/ch_logout_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="696dp"
+        android:text="Logout" />
+
+
+</RelativeLayout>
