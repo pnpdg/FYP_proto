@@ -78,7 +78,8 @@ public class CreateAccountActivity extends AppCompatActivity {
                             userInfo.put("UserEmail",emailEditText.getText().toString());
                             // specify if the user's role
 
-                            userInfo.put("Role","1");
+                            userInfo.put("Role1","4");
+                            userInfo.put("Role2","");
                             userInfo.put("Uid",user.getUid());
 
                             df.set(userInfo);

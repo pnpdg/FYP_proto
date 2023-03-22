@@ -95,14 +95,14 @@ public class LoginActivity extends AppCompatActivity {
                 Log.d("TAG","onSuccess : "+documentSnapshot.getData());
                 // identify the user access Level
 
-                if(documentSnapshot.getString("Role").equals("0")){
+                if(documentSnapshot.getString("Role1").equals("0")){
                     // user is admin
 
                     startActivity(new Intent(getApplicationContext(),AdminActivity.class));
                     finish();
                 }
 
-                if(documentSnapshot.getString("Role").equals("1")){
+                if(documentSnapshot.getString("Role1").equals("1") || documentSnapshot.getString("Role1").equals("2") ||documentSnapshot.getString("Role1").equals("3")||documentSnapshot.getString("Role1").equals("4")){
                     startActivity(new Intent(getApplicationContext(),ChooseFunction.class));
                     finish();
                 }

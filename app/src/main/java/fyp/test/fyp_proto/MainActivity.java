@@ -41,8 +41,10 @@ public class MainActivity extends AppCompatActivity {
     void showMenu(){
         //display menu
         PopupMenu popupMenu = new PopupMenu(MainActivity.this,menuBtn);
+        popupMenu.getMenu().add("Main Page");
         popupMenu.getMenu().add("Logout");
         popupMenu.show();
+
         popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
@@ -52,6 +54,13 @@ public class MainActivity extends AppCompatActivity {
                     finish();
                     return true;
                 }
+
+                if(menuItem.getTitle()=="Main Page"){
+                    startActivity(new Intent(MainActivity.this,ChooseFunction.class));
+                    finish();
+                    return true;
+                }
+
                 return false;
             }
         });

@@ -38,14 +38,16 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
 
         holder.fullName.setText(user.FullName);
         holder.userEmail.setText(user.UserEmail);
-        holder.Role.setText(user.Role);
+        holder.Role1.setText(user.Role1);
+        holder.Role2.setText(user.Role2);
         holder.Uid.setText(user.Uid);
 
         holder.itemView.setOnClickListener(v->{
             Intent intent = new Intent(context,user_detail_activity.class);
             intent.putExtra("FullName",user.FullName);
             intent.putExtra("UserEmail",user.UserEmail);
-            intent.putExtra("Role",user.Role);
+            intent.putExtra("Role1",user.Role1);
+            intent.putExtra("Role2",user.Role2);
             intent.putExtra("Uid",user.Uid);
             context.startActivity(intent);
         });
@@ -60,13 +62,14 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
 
     public static class MyViewHolder extends RecyclerView.ViewHolder{
 
-        TextView fullName, userEmail, Role, Uid;
+        TextView fullName, userEmail, Role1,Role2, Uid;
 
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
             fullName = itemView.findViewById(R.id.fullname);
             userEmail = itemView.findViewById(R.id.email);
-            Role = itemView.findViewById(R.id.role);
+            Role1 = itemView.findViewById(R.id.role1);
+            Role2 = itemView.findViewById(R.id.role2);
             Uid = itemView.findViewById(R.id.uid);
         }
     }

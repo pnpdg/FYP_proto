@@ -83,7 +83,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Role : "
+                android:text="Role1 : "
                 android:textColor="@color/black"
                 android:textSize="26sp"
                 android:textStyle="bold"
@@ -92,7 +92,35 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/role"
+                android:id="@+id/role1"
+                android:layout_marginStart="8dp"
+                android:text="status"
+                android:textColor="@color/black"
+                android:textSize="20sp"
+                />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:orientation="horizontal"
+            >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Role2 : "
+                android:textColor="@color/black"
+                android:textSize="26sp"
+                android:textStyle="bold"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/role2"
                 android:layout_marginStart="8dp"
                 android:text="status"
                 android:textColor="@color/black"
