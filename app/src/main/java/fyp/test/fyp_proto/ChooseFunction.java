@@ -33,6 +33,14 @@ public class ChooseFunction extends AppCompatActivity {
             }
         });
 
+        // redirect
+        galleryBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+
         logoutBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
