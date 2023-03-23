@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import androidx.cardview.widget.CardView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -13,23 +14,25 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 public class ChooseFunction extends AppCompatActivity {
+    private CardView noteBtn;
+    private CardView  galleryBtn;
 
-    Button noteBtn,galleryBtn,logoutBtn;
+    Button logoutBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_choose_function);
 
-        noteBtn = findViewById(R.id.move_note_btn);
-        galleryBtn = findViewById(R.id.move_gallery_btn);
+        noteBtn = findViewById(R.id.Note_card);
+        galleryBtn = findViewById(R.id.Gallery_card);
         logoutBtn = findViewById(R.id.ch_logout_btn);
 
         noteBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(getApplicationContext(),MainNote.class));
-                finish();
+               // finish();
             }
         });
 
