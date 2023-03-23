@@ -13,4 +13,18 @@
         <item name="android:statusBarColor">@color/my_primary</item>
         <!-- Customize your theme here. -->
     </style>
+
+    <style name = "CustomTheme" parent = "Theme.MaterialComponents.NoActionBar">
+        <item name = "colorPrimary">@color/my_primary</item>
+        <item name = "toolbarStyle">@style/ToolbarTheme</item>
+    </style>
+
+    <style name = "ThemeOverlay.App.Toolbar.Light." parent ="ThemeOverlay.MaterialComponents.Toolbar.Primary">
+        <item name = "colorOnPrimary">@color/white</item>
+    </style>
+
+    <style name = "SmoothCheckBoxStyle.">
+        <item name = "color_checked">@color/my_primary</item>
+        <item name = "color_tick">@color/white</item>
+    </style>
 </resources>
