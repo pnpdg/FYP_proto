@@ -28,9 +28,11 @@ import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.provider.OpenableColumns;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.webkit.MimeTypeMap;
 import android.widget.ImageButton;
+import android.widget.PopupMenu;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -72,6 +74,7 @@ import pub.devrel.easypermissions.EasyPermissions;
 
 public class Gallery extends AppCompatActivity implements EasyPermissions.PermissionCallbacks {
 
+    ImageButton galleryOptions;
     FloatingActionButton imagePickBtn;
     FloatingActionButton cameraBtn;
     FloatingActionButton testUpload;
@@ -94,6 +97,7 @@ public class Gallery extends AppCompatActivity implements EasyPermissions.Permis
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_gallery);
 
+        galleryOptions = findViewById((R.id.gallery_menu_btn));
         imagePickBtn = findViewById(R.id.add_gallery_btn);
         cameraBtn = findViewById(R.id.camera_btn);
         recyclerView = findViewById(R.id.gallery_recycler_view);
@@ -119,6 +123,30 @@ public class Gallery extends AppCompatActivity implements EasyPermissions.Permis
             }
         });
 
+        galleryOptions.setOnClickListener(view->{
+            PopupMenu pm = new PopupMenu(Gallery.this, galleryOptions);
+            pm.getMenu().add("Main Page");
+            pm.getMenu().add("Logout");
+            pm.show();
+
+            pm.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                @Override
+                public boolean onMenuItemClick(MenuItem menuItem) {
+                    if(menuItem.getTitle() == "Main Page"){
+                        startActivity(new Intent(Gallery.this,ChooseFunction.class));
+                        finish();
+                        return true;
+                    }
+
+                    if(menuItem.getTitle() == "Logout"){
+                        startActivity(new Intent(Gallery.this,LoginActivity.class));
+                        finish();
+                        return true;
+                    }
+                    return false;
+                }
+            });
+        });
 
         imagePickBtn.setOnClickListener(view ->{
             //Define camera and storage permissions
