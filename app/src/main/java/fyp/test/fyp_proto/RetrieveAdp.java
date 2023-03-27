@@ -1,5 +1,6 @@
 package fyp.test.fyp_proto;
 
+import android.content.Context;
 import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,15 +12,18 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
 public class RetrieveAdp extends RecyclerView.Adapter<RetrieveAdp.ViewHolder> {
     //Initialize variable
     ArrayList<String> newarrayList;
+    private Context mContext;
 
     //Create constructor
-    public RetrieveAdp(ArrayList<String> arrayList){
+    public RetrieveAdp(Context context,ArrayList<String> arrayList){
+        mContext = context;
         this.newarrayList = arrayList;
     }
     @NonNull
@@ -35,7 +39,11 @@ public class RetrieveAdp extends RecyclerView.Adapter<RetrieveAdp.ViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         //Print image using uri
-        holder.ivImage.setImageURI(Uri.parse(newarrayList.get(position)));
+        Picasso.with(mContext)
+                        .load(Uri.parse(newarrayList.get(position)))
+                        .into(holder.ivImage);
+
+        //holder.ivImage.setImageURI(Uri.parse(newarrayList.get(position)));
         holder.textView.setText("Image No." + position);
     }
 

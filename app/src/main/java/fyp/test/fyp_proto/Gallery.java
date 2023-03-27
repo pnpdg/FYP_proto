@@ -53,6 +53,9 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.model.DocumentCollections;
 import com.google.firebase.firestore.model.DocumentKey;
 import com.google.firebase.firestore.model.DocumentSet;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.google.firestore.v1.Document;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
@@ -89,8 +92,13 @@ public class Gallery extends AppCompatActivity implements EasyPermissions.Permis
     RetrieveAdp newadapter;
     Uri imageUri;
 
+    ArrayList<Uri> urlsList;
+
     //Database variables
     FirebaseFirestore db;
+    StorageReference ref;
+    FirebaseStorage mStorage;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -105,13 +113,17 @@ public class Gallery extends AppCompatActivity implements EasyPermissions.Permis
         layoutManager = new GridLayoutManager(this, 2);
         recyclerView.setLayoutManager(layoutManager);
         //adapter = new GalleryAdp(arrayList);
-        newadapter = new RetrieveAdp(newarrayList);
+        newadapter = new RetrieveAdp(Gallery.this,newarrayList);
         recyclerView.setAdapter(newadapter);
         //firebase instance
         db = FirebaseFirestore.getInstance();
+        mStorage = FirebaseStorage.getInstance();
+        ref = mStorage.getReference();
+        urlsList = new ArrayList<>();
+
 
         //Get Gallery From Database;
-        db.collection("Gallery 1").orderBy("name", Query.Direction.ASCENDING).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+        db.collection("Gallery").orderBy("name", Query.Direction.ASCENDING).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
             @Override
             public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                 List<DocumentSnapshot> list = queryDocumentSnapshots.getDocuments();
@@ -256,7 +268,8 @@ public class Gallery extends AppCompatActivity implements EasyPermissions.Permis
                 //latestList.removeAll(lastUpdatedList);
                 tempImgList.addAll(arrayList);
                 //Store to database
-                StoreLinks(tempImgList);
+                UploadImages(tempImgList);
+                //StoreLinks(tempImgList);
 
             } else if (requestCode == 2) {
                 //Get image from camera and start cropping
@@ -275,7 +288,8 @@ public class Gallery extends AppCompatActivity implements EasyPermissions.Permis
                 layoutManager = new GridLayoutManager(this, 2);
                 recyclerView.setLayoutManager(layoutManager);
                 //Send to database
-                StoreLinks(tempImgList);
+                UploadImages(tempImgList);
+                //StoreLinks(tempImgList);
 
             } else if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
                 //For error handling
@@ -286,10 +300,11 @@ public class Gallery extends AppCompatActivity implements EasyPermissions.Permis
             for(int i = 0; i< arrayList.size(); i++){
                 newarrayList.add(arrayList.get(i).toString());
             }
+            arrayList.clear();
 
             //recyclerView.setAdapter(new GalleryAdp(arrayList));
             //Send to recycleView to display
-            recyclerView.setAdapter(new RetrieveAdp(newarrayList));
+            recyclerView.setAdapter(new RetrieveAdp(Gallery.this, newarrayList));
         }
     }
 
@@ -329,6 +344,73 @@ public class Gallery extends AppCompatActivity implements EasyPermissions.Permis
         }
     }
 
+    private void UploadImages(ArrayList<Uri> ImgList){
+        for (int i =0; i < ImgList.size(); i++){
+            Uri individualImg = ImgList.get(i);
+            if (individualImg != null) {
+                if (ImgList.get(i).getScheme().startsWith("file")){
+                    StorageReference imgFolder = FirebaseStorage.getInstance().getReference().child("Gallery");
+                    final StorageReference imgName = imgFolder.child(System.currentTimeMillis()+"."+getCropFileExtension(individualImg));
+                    imgName.putFile(individualImg).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                            imgName.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                @Override
+                                public void onSuccess(Uri uri) {
+                                    urlsList.add(uri);
+                                    //urlsList.add(String.valueOf(uri));
+                                    StoreLinks(urlsList, imgName.toString());
+                                }
+                            });
+                        }
+                    });
+                }
+                else{
+                    StorageReference imgFolder = FirebaseStorage.getInstance().getReference().child("Gallery");
+                    final StorageReference imgName = imgFolder.child(System.currentTimeMillis()+"."+getFileExtension(individualImg));
+                    imgName.putFile(individualImg).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                            imgName.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                @Override
+                                public void onSuccess(Uri uri) {
+                                    urlsList.add(uri);
+                                    //urlsList.add(String.valueOf(uri));
+                                    StoreLinks(urlsList, imgName.toString());
+                                }
+                            });
+                        }
+                    });
+                }
+
+            }
+        }
+    }
+
+    private void StoreLinks(ArrayList<Uri> UriList, String imgName){
+        UploadGallery model;
+        //String Name = imgName.getText().toString();
+        for (int i =0; i < UriList.size(); i++){
+            model = new UploadGallery(imgName, UriList.get(i).toString());
+            db.collection("Gallery").add(model).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                @Override
+                public void onSuccess(DocumentReference documentReference) {
+                    Toast.makeText(Gallery.this, "Successfully uploaded to database", Toast.LENGTH_SHORT ).show();
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Toast.makeText(Gallery.this, "Uploading Failed", Toast.LENGTH_SHORT ).show();
+
+                }
+            });
+            }
+
+        tempImgList.clear();
+        UriList.clear();
+
+    }
+    /*
     //ArrayList<String> ImgList
     private void StoreLinks(ArrayList<Uri> ImgList){
         UploadGallery model;
@@ -356,7 +438,7 @@ public class Gallery extends AppCompatActivity implements EasyPermissions.Permis
         }
         ImgList.clear();
 
-    }
+    }*/
 
     private String getFileExtension(Uri uri){
         ContentResolver cR = getContentResolver();
