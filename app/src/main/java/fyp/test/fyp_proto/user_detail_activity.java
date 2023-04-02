@@ -19,10 +19,10 @@ import java.util.Map;
 
 public class user_detail_activity extends AppCompatActivity {
 
-    EditText fullName, userEmail, Role1, Role2;
+    EditText fullName, userEmail, Role;
     TextView Uid;
     ImageButton saveUserBtn;
-    String name,email,role1,role2,userId;
+    String name,email,role,userId;
     FirebaseFirestore fStore;
 
 
@@ -34,21 +34,18 @@ public class user_detail_activity extends AppCompatActivity {
 
         fullName = findViewById(R.id.fullname_text);
         userEmail = findViewById(R.id.email_text);
-        Role1 = findViewById(R.id.role1_text);
-        Role2 = findViewById(R.id.role2_text);
+        Role = findViewById(R.id.role_text);
         Uid = findViewById(R.id.uid_text);
 
         // receive
         name = getIntent().getStringExtra("FullName");
         email = getIntent().getStringExtra("UserEmail");
-        role1 = getIntent().getStringExtra("Role1");
-        role2 = getIntent().getStringExtra("Role2");
+        role = getIntent().getStringExtra("Role");
         userId = getIntent().getStringExtra("Uid");
 
         fullName.setText(name);
         userEmail.setText(email);
-        Role1.setText(role1);
-        Role2.setText(role2);
+        Role.setText(role);
         Uid.setText(userId);
 
 
@@ -61,8 +58,7 @@ public class user_detail_activity extends AppCompatActivity {
     void saveUser(String s){
         String fullname = fullName.getText().toString();
         String useremail = userEmail.getText().toString();
-        String role1 = Role1.getText().toString();
-        String role2 = Role2.getText().toString();
+        String role = Role.getText().toString();
 
         if(fullname ==null || fullname.isEmpty()){
             fullName.setError("FullName is required!!");
@@ -74,16 +70,15 @@ public class user_detail_activity extends AppCompatActivity {
             return;
         }
 
-        if(role1 == null || role1.isEmpty()){
-            Role1.setError("Role is required!!");
+        if(role == null || role.isEmpty()){
+            Role.setError("Role is required!!");
             return;
         }
 
         User user = new User();
         user.setFullName(fullname);
         user.setUserEmail(useremail);
-        user.setRole1(role1);
-        user.setRole2(role2);
+        user.setRole(role);
 
         // get current user
         Toast.makeText(user_detail_activity.this,"User Detail Updated",Toast.LENGTH_SHORT).show();
@@ -95,8 +90,7 @@ public class user_detail_activity extends AppCompatActivity {
         userInfo.put("UserEmail",user.UserEmail);
         // specify if the user's role
 
-        userInfo.put("Role1",Role1.getText().toString());
-        userInfo.put("Role2",Role2.getText().toString());
+        userInfo.put("Role",Role.getText().toString());
         userInfo.put("Uid",userId);
 
         df.set(userInfo);

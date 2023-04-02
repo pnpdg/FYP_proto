@@ -31,18 +31,12 @@ public class ChooseFunction extends AppCompatActivity {
         noteBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(getApplicationContext(),MainNote.class));
-               // finish();
+                startActivity(new Intent(getApplicationContext(),MainActivity.class));
+                finish();
             }
         });
 
         // redirect
-        galleryBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-            }
-        });
 
         galleryBtn.setOnClickListener(new View.OnClickListener() {
             @Override
