@@ -3,6 +3,7 @@ package fyp.test.fyp_proto;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.media.MediaDrm;
 import android.os.Bundle;
 import android.util.Base64;
@@ -27,10 +28,10 @@ import javax.crypto.spec.SecretKeySpec;
 
 public class NoteDetailsActivity extends AppCompatActivity {
 
-    EditText titleEditText,contentEditText;
+    EditText titleEditText,contentEditText,passwordEditText;
     ImageButton saveNoteBtn;
     TextView pageTitleTextView;
-    String title,content,docId;
+    String title,content,password,docId;
     boolean isEditMode = false;
     TextView deleteNoteTextViewBtn;
     FirebaseAuth fAuth;
@@ -45,6 +46,7 @@ public class NoteDetailsActivity extends AppCompatActivity {
 
         titleEditText = findViewById(R.id.notes_title_text);
         contentEditText = findViewById(R.id.notes_content_text);
+        passwordEditText = findViewById(R.id.notes_password_text);
         saveNoteBtn = findViewById(R.id.save_note_btn);
         pageTitleTextView = findViewById(R.id.page_title);
         deleteNoteTextViewBtn = findViewById(R.id.delete_note_text_view_btn);
@@ -52,6 +54,7 @@ public class NoteDetailsActivity extends AppCompatActivity {
         //receive
         title = getIntent().getStringExtra("title");
         content = getIntent().getStringExtra("content");
+        password = getIntent().getStringExtra("password");
         docId = getIntent().getStringExtra("docId");
 
         if(docId != null && !docId.isEmpty()){
@@ -73,6 +76,8 @@ public class NoteDetailsActivity extends AppCompatActivity {
 
         contentEditText.setText(decContent);
 
+        passwordEditText.setText(password);
+
         if(isEditMode){
             pageTitleTextView.setText("Edit your note");
             deleteNoteTextViewBtn.setVisibility(View.VISIBLE);
@@ -87,6 +92,7 @@ public class NoteDetailsActivity extends AppCompatActivity {
     void saveNote(){
         String noteTitle = titleEditText.getText().toString();
         String noteContent = contentEditText.getText().toString();
+        String notePassword = passwordEditText.getText().toString();
         // encrypt the noteContents
         String encContent = null;
 
@@ -112,9 +118,13 @@ public class NoteDetailsActivity extends AppCompatActivity {
 
         note.setTitle(noteTitle);
         note.setContent(encContent);
+        note.setPassword(notePassword);
         note.setTimestamp(Timestamp.now());
 
         saveNoteToFirebase(note);
+
+        startActivity(new Intent(getApplicationContext(),MainActivity.class));
+        finish();
 
     }
 
@@ -190,5 +200,8 @@ public class NoteDetailsActivity extends AppCompatActivity {
                 }
             }
         });
+
+        startActivity(new Intent(getApplicationContext(),MainActivity.class));
+        finish();
     }
 }

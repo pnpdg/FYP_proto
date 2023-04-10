@@ -5,6 +5,7 @@ import com.google.firebase.Timestamp;
 public class Note {
     String title;
     String content;
+    String password;
     Timestamp timestamp;
 
     public Note() {
@@ -25,6 +26,14 @@ public class Note {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public Timestamp getTimestamp() {

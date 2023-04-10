@@ -31,7 +31,7 @@ public class ChooseFunction extends AppCompatActivity {
         noteBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(getApplicationContext(),MainNote.class));
+                startActivity(new Intent(getApplicationContext(),MainActivity.class));
                // finish();
             }
         });

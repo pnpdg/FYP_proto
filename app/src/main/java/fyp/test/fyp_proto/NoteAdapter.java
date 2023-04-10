@@ -29,13 +29,25 @@ public class NoteAdapter extends FirestoreRecyclerAdapter<Note, NoteAdapter.Note
         holder.timestampTextView.setText(Utility.timestampToString(note.timestamp));
 
         holder.itemView.setOnClickListener(v->{
-            Intent intent = new Intent(context,NoteDetailsActivity.class);
-            intent.putExtra("title",note.title);
-            intent.putExtra("content",note.content);
-            String docId = this.getSnapshots().getSnapshot(position).getId();
-            intent.putExtra("docId",docId);
+                if (note.password.equals("")){
+                    Intent intent = new Intent(context,NoteDetailsActivity.class);
+                    intent.putExtra("title",note.title);
+                    intent.putExtra("content",note.content);
+                    intent.putExtra("password",note.password);
+                    String docId = this.getSnapshots().getSnapshot(position).getId();
+                    intent.putExtra("docId",docId);
 
-            context.startActivity(intent);
+                    context.startActivity(intent);
+                }else{
+                    Intent intent = new Intent(context,PasscodeActivity.class);;
+                    intent.putExtra("title",note.title);
+                    intent.putExtra("content",note.content);
+                    intent.putExtra("password",note.password);
+                    String docId = this.getSnapshots().getSnapshot(position).getId();
+                    intent.putExtra("docId",docId);
+
+                    context.startActivity(intent);
+                }
 
         });
 

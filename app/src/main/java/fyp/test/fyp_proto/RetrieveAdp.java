@@ -11,8 +11,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
-import com.squareup.picasso.Picasso;
+//import com.bumptech.glide.Glide;
+//import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
@@ -39,11 +39,13 @@ public class RetrieveAdp extends RecyclerView.Adapter<RetrieveAdp.ViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         //Print image using uri
-        Picasso.with(mContext)
+        /*Picasso.with(mContext)
                         .load(Uri.parse(newarrayList.get(position)))
                         .into(holder.ivImage);
 
         //holder.ivImage.setImageURI(Uri.parse(newarrayList.get(position)));
+
+         */
         holder.textView.setText("Image No." + position);
     }
 
