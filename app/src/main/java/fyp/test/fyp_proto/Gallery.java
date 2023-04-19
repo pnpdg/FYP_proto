@@ -38,6 +38,12 @@ import android.provider.BaseColumns;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.provider.OpenableColumns;
+import android.renderscript.Allocation;
+import android.renderscript.Element;
+import android.renderscript.RenderScript;
+import android.renderscript.ScriptIntrinsicBlur;
+import android.renderscript.Type;
+import android.util.Base64;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -49,11 +55,15 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.AggregateQuerySnapshot;
+import com.google.firebase.firestore.AggregateSource;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentId;
 import com.google.firebase.firestore.DocumentReference;
@@ -67,6 +77,7 @@ import com.google.firebase.firestore.SetOptions;
 import com.google.firebase.firestore.model.DocumentCollections;
 import com.google.firebase.firestore.model.DocumentKey;
 import com.google.firebase.firestore.model.DocumentSet;
+import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -76,18 +87,28 @@ import com.theartofdev.edmodo.cropper.CropImageView;
 
 import org.apache.commons.io.FileUtils;
 
+
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
@@ -98,6 +119,12 @@ import java.util.Objects;
 import java.util.zip.DataFormatException;
 import java.util.zip.Deflater;
 import java.util.zip.Inflater;
+
+import javax.crypto.Cipher;
+import javax.crypto.CipherOutputStream;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
 
 import droidninja.filepicker.FilePickerActivity;
 import droidninja.filepicker.FilePickerBuilder;
@@ -118,13 +145,15 @@ public class Gallery extends AppCompatActivity implements EasyPermissions.Permis
     RecyclerView.LayoutManager layoutManager;
     ArrayList<Uri> arrayList = new ArrayList<Uri>();
     ArrayList<Uri> tempImgList = new ArrayList<Uri>();
-    ArrayList<Uri> tempList = new ArrayList<Uri>();
+    //ArrayList<Uri> tempList = new ArrayList<Uri>();
     //ArrayList<Uri> lastUpdatedList = new ArrayList<Uri>();
     //ArrayList<Uri> latestList = new ArrayList<Uri>();
     ArrayList<UploadGallery> newarrayList = new ArrayList<UploadGallery>();
+    ArrayList<UploadGallery> tempList = new ArrayList<UploadGallery>();
     ArrayList<Uri> moveFilesList = new ArrayList<Uri>();
     ArrayList<String> moveFilesList2 = new ArrayList<String>();
     ArrayList<String> updatedList = new ArrayList<String>();
+    ArrayList<Uri> normalList = new ArrayList<Uri>();
 
     ArrayList<String> filePath = new ArrayList<>();
     //GalleryAdp adapter;
@@ -133,6 +162,7 @@ public class Gallery extends AppCompatActivity implements EasyPermissions.Permis
     Uri imageUri;
     ArrayList<Uri> hideList = new ArrayList<Uri>();
     File dir;
+    Bitmap bitmapMain;
 
     ArrayList<Uri> urlsList;
 
@@ -143,12 +173,30 @@ public class Gallery extends AppCompatActivity implements EasyPermissions.Permis
     DocumentReference dr;
     FirebaseUser currentUser;
 
+    //For encryption
+    private final static int READ_WRITE_BLOCK_BUFFER = 1024;
+    private final static String ALGO_IMAGE_ENCRYPTION = "AES/CBC/PKCS5Padding";
+    private final static String ALGO_SECRET_KEY = "AES";
+    File myDir;
+    File receiveDir;
+    File output;
+    String my_key;
+    String my_spec_key;
+    String FILE_NAME_ENC;
+    String newObjUri;
+    ArrayList<Uri> encryptList = new ArrayList<Uri>();
+    long numOfPass;
+    long num;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_gallery);
-
+        currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        myDir = new File(Environment.getExternalStorageDirectory().toString() + "/encrypted_images");
+        receiveDir = new File(Environment.getExternalStorageDirectory().toString() + "/fromDatabase");
+        my_key=currentUser.getUid();
+        my_spec_key = currentUser.getUid();
         /*if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
 
@@ -176,6 +224,7 @@ public class Gallery extends AppCompatActivity implements EasyPermissions.Permis
         recyclerView.setLayoutManager(layoutManager);
         //adapter = new GalleryAdp(arrayList);
         newadapter = new RetrieveAdp(Gallery.this,newarrayList);
+        //newadapter = new RetrieveAdp(Gallery.this,normalList);
         recyclerView.setAdapter(newadapter);
         newadapter.setOnItemClickListener(Gallery.this);
 
@@ -188,7 +237,7 @@ public class Gallery extends AppCompatActivity implements EasyPermissions.Permis
         mStorage.setMaxUploadRetryTimeMillis(120000);  // wait 2 mins for uploads
         ref = mStorage.getReference();
         urlsList = new ArrayList<>();
-        currentUser = FirebaseAuth.getInstance().getCurrentUser();
+
         //refreshGallery();
         //Get Gallery From Firestore;
         db.collection("Gallery").document(currentUser.getUid()).collection("My Gallery").orderBy("name", Query.Direction.ASCENDING).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
@@ -198,11 +247,27 @@ public class Gallery extends AppCompatActivity implements EasyPermissions.Permis
                 for (DocumentSnapshot d : list){
                     UploadGallery obj = d.toObject(UploadGallery.class);
                     //obj.setDocID(d.getId());
+                    //tempList.add(obj);
+                    String objUri = obj.getImageUrl();
+                    try {
+                        newObjUri = decrypt(objUri, currentUser.getUid());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    obj.setImageUrl(newObjUri);
                     newarrayList.add(obj);
                 }
                 newadapter.notifyDataSetChanged();
             }
         });
+
+        /*try {
+            convertUritoFile(tempList);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }*/
+
+
 
         /*db.collection("Gallery").addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
@@ -229,11 +294,22 @@ public class Gallery extends AppCompatActivity implements EasyPermissions.Permis
         //db.collection("Gallery").addSnapshotListener(new EventListener<DocumentSnapshot>()){
 
         //}
-
+        numOfPass();
 
         galleryOptions.setOnClickListener(view->{
+
             PopupMenu pm = new PopupMenu(Gallery.this, galleryOptions);
             pm.getMenu().add("Main Page");
+            //if(num < 1){
+            pm.getMenu().add("Set or Update password");
+            if(num > 0){
+                pm.getMenu().add("Delete password");
+            }
+            //}else{
+               // pm.getMenu().add("Set password").setEnabled(false);
+                //pm.getMenu().add("Update password");
+            //}
+
             pm.getMenu().add("Logout");
             pm.show();
 
@@ -243,6 +319,21 @@ public class Gallery extends AppCompatActivity implements EasyPermissions.Permis
                     if(menuItem.getTitle() == "Main Page"){
                         startActivity(new Intent(Gallery.this,ChooseFunction.class));
                         finish();
+                        return true;
+                    }
+
+                    if(menuItem.getTitle() == "Set or Update password"){
+                        //if(num < 1){
+                            startActivity(new Intent(Gallery.this,setPassGallery.class));
+                        //}else{
+                            //Toast.makeText(getApplicationContext(), "Password already exists", Toast.LENGTH_SHORT).show();
+                        //}
+                        //finish();
+                        return true;
+                    }
+
+                    if(menuItem.getTitle() == "Delete password"){
+                        deletePass();
                         return true;
                     }
 
@@ -297,6 +388,145 @@ public class Gallery extends AppCompatActivity implements EasyPermissions.Permis
                 );
             }
         });
+
+
+    }
+
+    @Override
+    public void onBackPressed(){
+        startActivity(new Intent(Gallery.this,ChooseFunction.class));
+    }
+
+    public void numOfPass(){
+        db.collection("Password").document(currentUser.getUid()).collection("Gallery Pass").count()
+                .get(AggregateSource.SERVER).addOnCompleteListener(new OnCompleteListener<AggregateQuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AggregateQuerySnapshot> task) {
+                        if(task.isSuccessful()){
+                            AggregateQuerySnapshot snapshot = task.getResult();
+                            num = snapshot.getCount();
+                            Log.i("Show number of entries in gallery pass", String.valueOf(num));
+                        }
+                    }
+                });
+        //return numOfPass;
+    }
+
+    public void deletePass(){
+        db.collection("Password").document(currentUser.getUid()).collection("Gallery Pass").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if(task.isSuccessful() && !task.getResult().isEmpty()){
+                    DocumentSnapshot documentSnapshot = task.getResult().getDocuments().get(0);
+                    String documentID = documentSnapshot.getId();
+                    db.collection("Password").document(currentUser.getUid()).collection("Gallery Pass").document(documentID).delete()
+                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void unused) {
+                                    Toast.makeText(getApplicationContext(), "Password Deleted", Toast.LENGTH_SHORT).show();
+                                    Log.i("Deletion of password","Success");
+                                }
+                            }).addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Toast.makeText(getApplicationContext(), "Failed to delete password", Toast.LENGTH_SHORT).show();
+                                    Log.i("Deletion of password","Failure");
+                                }
+                            });
+                }
+            }
+        });
+    }
+
+    public String decrypt(String outputString, String password) throws Exception{
+        SecretKeySpec key = generateKey(password);
+        Cipher c = Cipher.getInstance("AES");
+        c.init(Cipher.DECRYPT_MODE, key);
+        byte[] decodedValue = Base64.decode(outputString, Base64.DEFAULT);
+        byte[] decValue = c.doFinal(decodedValue);
+        String decryptedValue = new String(decValue);
+        return decryptedValue;
+    }
+
+    public String encrypt (String Data, String password) throws Exception{
+        SecretKeySpec key = generateKey(password);
+        Cipher c = Cipher.getInstance("AES");
+        c.init(Cipher.ENCRYPT_MODE,key);
+        byte[] encVal = c.doFinal(Data.getBytes());
+        String encryptedvalue = Base64.encodeToString(encVal,Base64.DEFAULT);
+        return encryptedvalue;
+    }
+
+    public SecretKeySpec generateKey(String password) throws Exception{
+        final MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        byte[]  bytes = password.getBytes("UTF-8");
+        digest.update(bytes, 0, bytes.length);
+        byte[] key = digest.digest();
+        SecretKeySpec secretKeySpec = new SecretKeySpec(key,"AES");
+        return secretKeySpec;
+    }
+    private void convertUritoFile(ArrayList<UploadGallery> ls) throws IOException {
+        if(!receiveDir.exists()){
+            receiveDir.mkdir();
+        }
+        for( int i = 0; i< ls.size(); i++){
+            //Uri ug = Uri.parse(ls.get(i).getImageUrl());
+            /*InputStream inputStream = null;
+            inputStream = getContentResolver().openInputStream(ug);
+            Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+            String FILE_NAME_ENC = String.valueOf(System.currentTimeMillis());
+            File output = new File(receiveDir, FILE_NAME_ENC);
+            OutputStream outputStream = new FileOutputStream(output);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
+            outputStream.close();*/
+
+            /*Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), ug);
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+            InputStream is = new ByteArrayInputStream(stream.toByteArray());
+            String FILE_NAME_ENC = String.valueOf(System.currentTimeMillis());
+            File output = new File(receiveDir, FILE_NAME_ENC);
+            OutputStream out = new FileOutputStream(output);
+            int count = 0;
+            byte[] buffer = new byte[READ_WRITE_BLOCK_BUFFER];
+            while ((count = is.read(buffer))> 0)
+                out.write(buffer, 0, count);
+
+            out.close();*/
+            //String ug = ls.get(i).getImageUrl();
+            FirebaseStorage storageTest = FirebaseStorage.getInstance();
+            String name = (ls.get(i)).getName();
+            String finalName = name.substring(name.lastIndexOf("/")+1).trim();
+            StorageReference sr = storageTest.getReference(name);
+
+            //String FILE_NAME_ENC = String.valueOf(System.currentTimeMillis());
+            output = new File(receiveDir, finalName);
+            sr.getFile(output)
+                    .addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+                            decryptMethod(output.toString(), receiveDir, finalName);
+                            //Toast.makeText(getApplicationContext(), "File downloaded", Toast.LENGTH_SHORT).show();
+                            Log.i("convertUriToFile", "Local item file created");
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            //Toast.makeText(getApplicationContext(), "File download failed", Toast.LENGTH_SHORT).show();
+                            Log.i("convertUriToFile", "Local item file not created");
+                        }
+                    });
+            /*String ug = ls.get(i).getImageUrl();
+            String FILE_NAME_ENC = String.valueOf(System.currentTimeMillis());
+            File output = new File(receiveDir, FILE_NAME_ENC);
+            FileOutputStream out = new FileOutputStream(output);
+            //FileOutputStream fos = openFileOutput(name, MODE_PRIVATE);
+            File file = new File(ug);
+            //byte[] bytes = compress(FileUtils.readFileToByteArray(file), Deflater.BEST_COMPRESSION, false);
+            byte[] bytes = getBytesFromFile(file);
+            out.write(bytes);
+            out.close();*/
+        }
     }
 
     private void refreshGallery() {
@@ -375,11 +605,32 @@ public class Gallery extends AppCompatActivity implements EasyPermissions.Permis
                 //Remove duplicates when uploading to database
                 //latestList.addAll(arrayList);
                 //latestList.removeAll(lastUpdatedList);
+                /*try {
+                    tempImgList.addAll(encryptMethod(arrayList));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }*/
+
+                /*try {
+                    unblurImg(arrayList);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                newadapter.notifyDataSetChanged();*/
+
+
+
                 tempImgList.addAll(arrayList);
                 //moveFilesList.addAll(arrayList);
                 //Store to database
                 UploadImages(tempImgList);
                 deleteFile(arrayList);
+                /*File[] files = myDir.listFiles();
+                for(File f: files){
+                    if(f.isFile()){
+                        f.delete();
+                    }
+                }*/
                 /*for (int i = 0; i< arrayList.size(); i++){
                     Uri uri = getContentUriId(Gallery.this, arrayList.get(i));
                     File f = new File(uri.toString());
@@ -600,6 +851,111 @@ public class Gallery extends AppCompatActivity implements EasyPermissions.Permis
             Toast.makeText(getApplicationContext(), "Permission Denied", Toast.LENGTH_SHORT).show();
         }
     }
+    public ArrayList<Uri> encryptMethod(ArrayList<Uri> al) throws IOException {
+        if(!myDir.exists()){
+            myDir.mkdir();
+        }
+        for(int i = 0; i < al.size(); i++){
+            Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), al.get(i));
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+            InputStream is = new ByteArrayInputStream(stream.toByteArray());
+            FILE_NAME_ENC = String.valueOf(System.currentTimeMillis());
+            File outputFileEnc = new File(myDir, FILE_NAME_ENC);
+            try{
+                encryptToFile(my_key, my_spec_key, is, new FileOutputStream(outputFileEnc));
+                File fileUpload = new File(myDir, String.valueOf(FILE_NAME_ENC));
+                Uri imageUri = Uri.fromFile(fileUpload);
+                encryptList.add(imageUri);
+                Toast.makeText(Gallery.this, "Encrypted", Toast.LENGTH_SHORT).show();
+            }catch (IOException e){
+                e.printStackTrace();
+            }
+
+        }
+        return encryptList;
+    }
+    public static void encryptToFile(String keyStr, String specStr, InputStream in, OutputStream out) throws IOException {
+        try{
+            IvParameterSpec iv = new IvParameterSpec(specStr.getBytes("UTF-8"));
+            SecretKeySpec keySpec = new SecretKeySpec(keyStr.getBytes("UTF-8"), ALGO_SECRET_KEY);
+            Cipher c = Cipher.getInstance((ALGO_IMAGE_ENCRYPTION));
+            c.init(Cipher.ENCRYPT_MODE, keySpec, iv);
+            out = new CipherOutputStream(out, c);
+            int count = 0;
+            byte[] buffer = new byte[READ_WRITE_BLOCK_BUFFER];
+            while ((count = in.read(buffer))> 0)
+                out.write(buffer, 0, count);
+        } catch (InvalidAlgorithmParameterException e) {
+            e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        } catch (NoSuchPaddingException e) {
+            e.printStackTrace();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InvalidKeyException e) {
+            e.printStackTrace();
+        } finally{
+            out.close();
+        }
+    }
+
+    public void decryptMethod(String path, File rootPath, String name){
+        try{
+            File outputFileDir = new File(rootPath, name + ".jpg");
+            decryptToFile(my_key, my_spec_key, new FileInputStream(path), new FileOutputStream(outputFileDir));
+            Log.i("decryptMethod", "Image successfully decrypted");
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            Log.i("decryptMethod", "Decryption error");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    /*private ArrayList<Uri> decryptMethod(ArrayList<Uri> al) throws IOException {
+        if(!myDir.exists()){
+            myDir.mkdir();
+        }
+        for(int i = 0; i < al.size(); i++){
+            Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), al.get(i));
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+            InputStream is = new ByteArrayInputStream(stream.toByteArray());
+            String FILE_NAME_ENC = String.valueOf(System.currentTimeMillis());
+            File outputFileEnc = new File(myDir, FILE_NAME_ENC);
+            try{
+                decryptToFile(my_key, my_spec_key, is, new FileOutputStream(outputFileEnc));
+                File fileUpload = new File(myDir, String.valueOf(FILE_NAME_ENC));
+                Uri imageUri = Uri.fromFile(fileUpload);
+                encryptList.add(imageUri);
+                Toast.makeText(Gallery.this, "Encrypted", Toast.LENGTH_SHORT).show();
+            }catch (IOException e){
+                e.printStackTrace();
+            }
+
+        }
+        return encryptList;
+    }*/
+    public static void decryptToFile(String keyStr, String specStr, InputStream in, OutputStream out) throws IOException {
+        try{
+            IvParameterSpec iv = new IvParameterSpec(specStr.getBytes("UTF-8"));
+            SecretKeySpec keySpec = new SecretKeySpec(keyStr.getBytes("UTF-8"), ALGO_SECRET_KEY);
+            Cipher c = Cipher.getInstance((ALGO_IMAGE_ENCRYPTION));
+            c.init(Cipher.DECRYPT_MODE, keySpec, iv);
+            out = new CipherOutputStream(out, c);
+            int count = 0;
+            byte[] buffer = new byte[READ_WRITE_BLOCK_BUFFER];
+            while ((count = in.read(buffer))> 0)
+                out.write(buffer, 0, count);
+        }catch (Exception e) {
+            Log.i("Decryption", "DecryptToFile Error:" + e.getMessage());
+        } finally{
+            out.close();
+        }
+    }
 
     //Upload to storage
     private void UploadImages(ArrayList<Uri> ImgList){
@@ -608,16 +964,26 @@ public class Gallery extends AppCompatActivity implements EasyPermissions.Permis
             if (individualImg != null) {
                 if (ImgList.get(i).getScheme().startsWith("file")){
                     StorageReference imgFolder = FirebaseStorage.getInstance().getReference().child("Gallery").child(currentUser.getUid());
-                    final StorageReference imgName = imgFolder.child(System.currentTimeMillis()+"."+getCropFileExtension(individualImg));
+                    final StorageReference imgName = imgFolder.child(System.currentTimeMillis() + "." + getCropFileExtension(individualImg));
                     imgName.putFile(individualImg).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                         @Override
                         public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                             imgName.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                                 @Override
                                 public void onSuccess(Uri uri) {
+                                    /*String splitUri = uri.toString();
+                                    int index = splitUri.indexOf("/", splitUri.indexOf("/", splitUri.indexOf("/") + 1) + 1);
+                                    splitUri = splitUri.substring(index).trim();
+                                    String newLink = "https://ik.imagekit.io/60gjeavuh/tr:bl-20";
+                                    String finalUrl = newLink.concat(splitUri);
+                                    urlsList.add(Uri.parse(finalUrl));*/
                                     urlsList.add(uri);
                                     //urlsList.add(String.valueOf(uri));
-                                    StoreLinks(urlsList, imgName.toString());
+                                    try {
+                                        StoreLinks(urlsList, imgName.toString());
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
                                 }
                             });
                         }
@@ -625,16 +991,26 @@ public class Gallery extends AppCompatActivity implements EasyPermissions.Permis
                 }
                 else{
                     StorageReference imgFolder = FirebaseStorage.getInstance().getReference().child("Gallery").child(currentUser.getUid());
-                    final StorageReference imgName = imgFolder.child(System.currentTimeMillis()+"."+getFileExtension(individualImg));
+                    final StorageReference imgName = imgFolder.child(System.currentTimeMillis() + "." + getFileExtension(individualImg));
                     imgName.putFile(individualImg).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                         @Override
                         public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                             imgName.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                                 @Override
                                 public void onSuccess(Uri uri) {
+                                    /*String splitUri = uri.toString();
+                                    int index = splitUri.indexOf("/", splitUri.indexOf("/", splitUri.indexOf("/") + 1) + 1);
+                                    splitUri = splitUri.substring(index).trim();
+                                    String newLink = "https://ik.imagekit.io/60gjeavuh/tr:bl-20";
+                                    String finalUrl = newLink.concat(splitUri);
+                                    urlsList.add(Uri.parse(finalUrl));*/
                                     urlsList.add(uri);
                                     //urlsList.add(String.valueOf(uri));
-                                    StoreLinks(urlsList, imgName.toString());
+                                    try {
+                                        StoreLinks(urlsList, imgName.toString());
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
                                 }
                             });
                         }
@@ -647,12 +1023,14 @@ public class Gallery extends AppCompatActivity implements EasyPermissions.Permis
     }
 
     //To firestore
-    private void StoreLinks(ArrayList<Uri> UriList, String imgName){
+    private void StoreLinks(ArrayList<Uri> UriList, String imgName) throws Exception {
         UploadGallery model;
         //String Name = imgName.getText().toString();
         for (int i =0; i < UriList.size(); i++){
             Uri uri = UriList.get(i);
-            model = new UploadGallery(imgName, uri.toString());
+            String newUri = encrypt(uri.toString(), currentUser.getUid());
+            //model = new UploadGallery(imgName, uri.toString());
+            model = new UploadGallery(imgName, newUri);
             UploadGallery finalModel = model;
             db.collection("Gallery").document(currentUser.getUid()).collection("My Gallery").add(model).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                 @Override
@@ -664,6 +1042,14 @@ public class Gallery extends AppCompatActivity implements EasyPermissions.Permis
                                     .set(finalModel, SetOptions.merge()).addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
                                 public void onSuccess(Void unused) {
+                                    //tempList.add(finalModel);
+                                    String objUri = finalModel.getImageUrl();
+                                    try {
+                                        newObjUri = decrypt(objUri, currentUser.getUid());
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
+                                    finalModel.setImageUrl(newObjUri);
                                     newarrayList.add(finalModel);
                                     newadapter.notifyDataSetChanged();
                                     Toast.makeText(Gallery.this, "Successfully uploaded to database", Toast.LENGTH_SHORT ).show();
@@ -681,6 +1067,7 @@ public class Gallery extends AppCompatActivity implements EasyPermissions.Permis
 
         tempImgList.clear();
         UriList.clear();
+        //encryptList.clear();
     }
     /*
     //ArrayList<String> ImgList
@@ -1105,7 +1492,7 @@ public class Gallery extends AppCompatActivity implements EasyPermissions.Permis
     @Override
     public void onDeleteClick(int position) {
 
-        UploadGallery selectedItem = newarrayList.get(position);;
+        UploadGallery selectedItem = newarrayList.get(position);
         StorageReference imageRef = mStorage.getReferenceFromUrl((selectedItem.getImageUrl()));
         imageRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
@@ -1135,6 +1522,13 @@ public class Gallery extends AppCompatActivity implements EasyPermissions.Permis
                         for (DocumentSnapshot d : list){
                             UploadGallery obj = d.toObject(UploadGallery.class);
                             //obj.setDocID(d.getId());
+                            String objUri = obj.getImageUrl();
+                            try {
+                                newObjUri = decrypt(objUri, currentUser.getUid());
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                            obj.setImageUrl(newObjUri);
                             newarrayList.add(obj);
                         }
                         newadapter.notifyDataSetChanged();
@@ -1165,9 +1559,9 @@ public class Gallery extends AppCompatActivity implements EasyPermissions.Permis
                     public void onSuccess(byte[] bytes) {
                         Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
                         createImage(Gallery.this, bitmap);
+                        onDeleteClick(position);
                     }
                 });
-        onDeleteClick(position);
     }
 
     public void createImage(Context context, Bitmap bitmap){
@@ -1205,7 +1599,7 @@ public class Gallery extends AppCompatActivity implements EasyPermissions.Permis
         }*/
     }
 
-    class waitTask extends AsyncTask<Void, Void, Void>{
+    /*class waitTask extends AsyncTask<Void, Void, Void>{
 
         ProgressDialog pd;
 
@@ -1220,7 +1614,7 @@ public class Gallery extends AppCompatActivity implements EasyPermissions.Permis
         protected Void doInBackground(Void... voids) {
 
             //newarrayList.add(uri.toString());
-            newadapter.notifyDataSetChanged();
+            createImage(Gallery.this, bitmapMain);
             try {
                 Thread.sleep(5000);
             }catch (InterruptedException e) {
@@ -1233,10 +1627,54 @@ public class Gallery extends AppCompatActivity implements EasyPermissions.Permis
         @Override
         protected void onPostExecute(Void unused){
             super.onPostExecute(unused);
-            layoutManager = new GridLayoutManager(getApplicationContext(), 2);
-            recyclerView.setLayoutManager(layoutManager);
-            recyclerView.setAdapter(new RetrieveAdp(Gallery.this,newarrayList));
+            //layoutManager = new GridLayoutManager(getApplicationContext(), 2);
+            //recyclerView.setLayoutManager(layoutManager);
+            //recyclerView.setAdapter(new RetrieveAdp(Gallery.this,newarrayList));
             pd.dismiss();
         }
+    }*/
+
+    public void blurImg(ArrayList<Uri> list) throws IOException {
+        for( int i =0; i< list.size(); i++){
+            Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), list.get(i));
+            Bitmap outputBitmap = Bitmap.createBitmap(bitmap);
+            RenderScript renderScript = RenderScript.create(this);
+            ScriptIntrinsicBlur intrinsicBlur = ScriptIntrinsicBlur.create(renderScript, Element.U8_4(renderScript));
+            Allocation input = Allocation.createFromBitmap(renderScript, bitmap);
+            Allocation output = Allocation.createFromBitmap(renderScript, outputBitmap);
+            intrinsicBlur.setRadius(25);
+            intrinsicBlur.setInput(input);
+            intrinsicBlur.forEach(output);
+            output.copyTo(outputBitmap);
+
+            Uri uri = bitmapToUri(getApplicationContext(), outputBitmap);
+            normalList.add(uri);
+        }
+    }
+
+    public void unblurImg(ArrayList<Uri> list) throws IOException {
+        for( int i =0; i< list.size(); i++){
+            Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), list.get(i));
+            RenderScript renderScript = RenderScript.create(this);
+            ScriptIntrinsicBlur intrinsicBlur = ScriptIntrinsicBlur.create(renderScript, Element.U8_4(renderScript));
+            intrinsicBlur.setRadius(0.1f);
+            Allocation input = Allocation.createFromBitmap(renderScript, bitmap);
+            Type type = input.getType();
+            Allocation output = Allocation.createTyped(renderScript, type);
+            intrinsicBlur.setInput(input);
+            intrinsicBlur.forEach(output);
+            Bitmap outputBitmap = Bitmap.createBitmap(bitmap.getWidth(),bitmap.getHeight(), bitmap.getConfig());
+            output.copyTo(outputBitmap);
+
+            Uri uri = bitmapToUri(getApplicationContext(), outputBitmap);
+            normalList.add(uri);
+        }
+    }
+
+    public Uri bitmapToUri(Context context, Bitmap bitmap){
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+        String path = MediaStore.Images.Media.insertImage(context.getContentResolver(), bitmap, String.valueOf(System.currentTimeMillis()), null);
+        return Uri.parse(path);
     }
 }

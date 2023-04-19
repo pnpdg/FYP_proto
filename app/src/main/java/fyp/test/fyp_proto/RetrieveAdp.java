@@ -1,6 +1,8 @@
 package fyp.test.fyp_proto;
 
 import android.content.Context;
+import android.graphics.RenderEffect;
+import android.graphics.Shader;
 import android.net.Uri;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
@@ -23,6 +25,7 @@ public class RetrieveAdp extends RecyclerView.Adapter<RetrieveAdp.ViewHolder> {
     //Initialize variable
     //ArrayList<UploadGallery> newarrayList;
     ArrayList<UploadGallery> newarrayList;
+    //ArrayList<Uri> normalList;
     private Context mContext;
     private OnItemClickListener mListener;
 
@@ -50,7 +53,7 @@ public class RetrieveAdp extends RecyclerView.Adapter<RetrieveAdp.ViewHolder> {
                         .into(holder.ivImage);
         //Glide.with(mContext).load(Uri.parse(newarrayList.get(position))).into(holder.ivImage);
 
-        //holder.ivImage.setImageURI(Uri.parse(newarrayList.get(position)));
+        //holder.ivImage.setImageURI(normalList.get(position));
         holder.textView.setText("Image No." + position);
 
     }
