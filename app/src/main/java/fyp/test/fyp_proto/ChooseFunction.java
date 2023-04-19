@@ -3,6 +3,7 @@ package fyp.test.fyp_proto;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
@@ -11,6 +12,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
+
 
 import androidx.cardview.widget.CardView;
 
@@ -23,10 +25,12 @@ import com.google.firebase.firestore.FirebaseFirestore;
 public class ChooseFunction extends AppCompatActivity {
     private CardView noteBtn;
     private CardView  galleryBtn;
+   // private Menu settingsBtn;
 
     Button logoutBtn;
 
 
+    @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -36,6 +40,7 @@ public class ChooseFunction extends AppCompatActivity {
 
         noteBtn = findViewById(R.id.Note_card);
         galleryBtn = findViewById(R.id.Gallery_card);
+      //  settingsBtn = findViewById(R.id.menu_Settings);
        logoutBtn = findViewById(R.id.ch_logout_btn);
 
         noteBtn.setOnClickListener(new View.OnClickListener() {
@@ -62,7 +67,10 @@ public class ChooseFunction extends AppCompatActivity {
             }
         });
 
-       logoutBtn.setOnClickListener(new View.OnClickListener() {
+
+
+
+        logoutBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 FirebaseAuth.getInstance().signOut();
@@ -81,25 +89,22 @@ public class ChooseFunction extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.menu_Addbtn:
-                Toast.makeText(this, "Add selected", Toast.LENGTH_SHORT).show();
-                return true;
-            case R.id.menu_CreateFolder:
-                Toast.makeText(this, "Create Folders selected", Toast.LENGTH_SHORT).show();
-                return true;
-            case R.id.menu_AddFiles:
-                Toast.makeText(this, "Add Files selected", Toast.LENGTH_SHORT).show();
-                return true;
-            case R.id.menu_Customise:
-                Toast.makeText(this, "Customise selected", Toast.LENGTH_SHORT).show();
-                return true;
-            case R.id.menu_Settings:
-                Toast.makeText(this, "Settings selected", Toast.LENGTH_SHORT).show();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
+            int id = item.getItemId();
+
+        if (id == R.id.menu_Settings) {
+            Intent intent1 = new Intent(this,Settings.class);
+            this.startActivity(intent1);
+            return true;
         }
+
+       // switch (item.getItemId()) {
+
+           // case R.id.menu_Settings:
+              //  Toast.makeText(this, "Settings selected", Toast.LENGTH_SHORT).show();
+              //  return true;
+            //default:
+                return super.onOptionsItemSelected(item);
+       // }
 
     }
 

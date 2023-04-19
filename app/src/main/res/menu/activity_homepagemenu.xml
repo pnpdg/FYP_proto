@@ -1,28 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".MainActivity">
 
-    <item android:id="@+id/menu_Addbtn"
-        android:icon="@drawable/ic_baseline_add"
-        android:title="Search"
-        app:showAsAction="ifRoom"/>
+
 
     <item android:id="@+id/menu_Search"
         android:icon="@drawable/ic_baseline_search"
         android:title="Search"
         app:showAsAction="ifRoom"/>
 
-    <item android:id="@+id/menu_CreateFolder"
-        android:icon="@drawable/ic_baseline_more"
-        android:title="Create Folder"
-        />
-    <item android:id="@+id/menu_AddFiles"
-        android:icon="@drawable/ic_baseline_more"
-        android:title="Add Files"
-        />
-    <item android:id="@+id/menu_Customise"
-        android:title="Customise"
-        />
     <item android:id="@+id/menu_Settings"
         android:title="Settings"
         />
