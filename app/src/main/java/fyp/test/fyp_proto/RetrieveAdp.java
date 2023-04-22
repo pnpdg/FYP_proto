@@ -21,6 +21,8 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
+import jp.wasabeef.picasso.transformations.BlurTransformation;
+
 public class RetrieveAdp extends RecyclerView.Adapter<RetrieveAdp.ViewHolder> {
     //Initialize variable
     //ArrayList<UploadGallery> newarrayList;
@@ -48,9 +50,10 @@ public class RetrieveAdp extends RecyclerView.Adapter<RetrieveAdp.ViewHolder> {
     public void onBindViewHolder(@NonNull ViewHolder holder, int position)  {
         //Print image using uri
         UploadGallery uploadCurrent = newarrayList.get(position);
-        Picasso.with(mContext)
-                        .load(uploadCurrent.getImageUrl())
-                        .into(holder.ivImage);
+        Picasso.get()
+                .load(uploadCurrent.getImageUrl())
+                .transform(new BlurTransformation(mContext, 140, 8))
+                .into(holder.ivImage);
         //Glide.with(mContext).load(Uri.parse(newarrayList.get(position))).into(holder.ivImage);
 
         //holder.ivImage.setImageURI(normalList.get(position));

@@ -29,7 +29,7 @@ import java.security.MessageDigest;
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
-public class enterPassGallery extends AppCompatActivity {
+public class enterPassGallery extends BaseActivity {
 
     EditText galleryPassText;
     Button enterBtn;

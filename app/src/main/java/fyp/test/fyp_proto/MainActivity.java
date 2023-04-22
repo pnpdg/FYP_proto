@@ -15,7 +15,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.Query;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends BaseActivity {
 
     FloatingActionButton addNoteBtn;
     RecyclerView recyclerView;

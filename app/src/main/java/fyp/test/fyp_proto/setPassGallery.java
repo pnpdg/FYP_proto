@@ -34,7 +34,7 @@ import java.security.MessageDigest;
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
-public class setPassGallery extends AppCompatActivity {
+public class setPassGallery extends BaseActivity {
 
     EditText galleryPassText;
     MaterialButton createBtn;

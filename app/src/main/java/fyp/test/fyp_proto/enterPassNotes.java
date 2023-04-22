@@ -29,7 +29,7 @@ import java.security.MessageDigest;
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
-public class enterPassNotes extends AppCompatActivity {
+public class enterPassNotes extends BaseActivity {
 
     EditText notesPassText;
     Button enterBtn;

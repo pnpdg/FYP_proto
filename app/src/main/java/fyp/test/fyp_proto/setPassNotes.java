@@ -34,7 +34,7 @@ import java.security.MessageDigest;
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
-public class setPassNotes extends AppCompatActivity {
+public class setPassNotes extends BaseActivity {
 
     EditText notesPassText;
     MaterialButton createBtn;

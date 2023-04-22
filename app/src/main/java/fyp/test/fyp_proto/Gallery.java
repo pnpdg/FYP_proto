@@ -133,7 +133,7 @@ import droidninja.filepicker.utils.FilePickerUtils;
 import pub.devrel.easypermissions.AppSettingsDialog;
 import pub.devrel.easypermissions.EasyPermissions;
 
-public class Gallery extends AppCompatActivity implements EasyPermissions.PermissionCallbacks, RetrieveAdp.OnItemClickListener {
+public class Gallery extends BaseActivity implements EasyPermissions.PermissionCallbacks, RetrieveAdp.OnItemClickListener {
 
     private static final int DELETE_REQUEST_CODE = 13;
     private static final int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 99;

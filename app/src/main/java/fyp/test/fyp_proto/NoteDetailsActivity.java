@@ -26,7 +26,7 @@ import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
-public class NoteDetailsActivity extends AppCompatActivity {
+public class NoteDetailsActivity extends BaseActivity {
 
     EditText titleEditText,contentEditText,passwordEditText;
     ImageButton saveNoteBtn;

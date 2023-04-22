@@ -14,6 +14,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Switch;
 import android.widget.Toast;
 
 
@@ -29,10 +30,10 @@ import com.google.firebase.firestore.AggregateSource;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-public class ChooseFunction extends AppCompatActivity {
+public class ChooseFunction extends BaseActivity{
     private CardView noteBtn;
     private CardView  galleryBtn;
-   // private Menu settingsBtn;
+    // private Menu settingsBtn;
 
     Button logoutBtn;
     FirebaseFirestore db;
@@ -108,7 +109,7 @@ public class ChooseFunction extends AppCompatActivity {
             int id = item.getItemId();
 
         if (id == R.id.menu_Settings) {
-            Intent intent1 = new Intent(this,Settings.class);
+            Intent intent1 = new Intent(ChooseFunction.this,Setting.class);
             this.startActivity(intent1);
             return true;
         }
