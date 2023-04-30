@@ -47,7 +47,6 @@ public class setPassGallery extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_set_pass_gallery);
 
-
         galleryPassText = findViewById(R.id.gallery_pass_text);
         createBtn = findViewById(R.id.create_btn);
         currentUser = FirebaseAuth.getInstance().getCurrentUser();

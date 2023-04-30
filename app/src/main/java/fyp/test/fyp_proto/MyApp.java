@@ -19,7 +19,7 @@ public class MyApp extends Application {
             public void run() {
                 listener.onSessionLogout();
             }
-        }, 30000);
+        }, 3000000);
     }
 
     private void cancelTimer() {

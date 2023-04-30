@@ -10,15 +10,17 @@ public class UploadGallery {
     private String mName;
     private String mImageUrl;
     private String docID;
+    private String pass;
 
     public UploadGallery(){
         //empty constructor needed
     }
 
-    public UploadGallery(String name, String imageUrl){
+    public UploadGallery(String name, String imageUrl, String password){
 
         mName = name;
         mImageUrl = imageUrl;
+        pass = password;
     }
 
     public String getName(){
@@ -43,5 +45,13 @@ public class UploadGallery {
 
     public void setDocId(String documentID){
         docID = documentID;
+    }
+
+    public String getPass(){
+        return pass;
+    }
+
+    public void setPass(String password){
+        pass = password;
     }
 }

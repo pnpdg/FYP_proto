@@ -50,10 +50,17 @@ public class RetrieveAdp extends RecyclerView.Adapter<RetrieveAdp.ViewHolder> {
     public void onBindViewHolder(@NonNull ViewHolder holder, int position)  {
         //Print image using uri
         UploadGallery uploadCurrent = newarrayList.get(position);
-        Picasso.get()
-                .load(uploadCurrent.getImageUrl())
-                .transform(new BlurTransformation(mContext, 140, 8))
-                .into(holder.ivImage);
+        if(uploadCurrent.getPass()!= ""){
+            Picasso.get()
+                    .load(uploadCurrent.getImageUrl())
+                    .transform(new BlurTransformation(mContext, 140, 8))
+                    .into(holder.ivImage);
+        }else{
+            Picasso.get()
+                    .load(uploadCurrent.getImageUrl())
+                    .into(holder.ivImage);
+        }
+
         //Glide.with(mContext).load(Uri.parse(newarrayList.get(position))).into(holder.ivImage);
 
         //holder.ivImage.setImageURI(normalList.get(position));

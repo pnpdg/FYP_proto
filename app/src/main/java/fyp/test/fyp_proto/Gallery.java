@@ -301,9 +301,9 @@ public class Gallery extends BaseActivity implements EasyPermissions.PermissionC
             PopupMenu pm = new PopupMenu(Gallery.this, galleryOptions);
             pm.getMenu().add("Main Page");
             //if(num < 1){
-            pm.getMenu().add("Set or Update password");
+            pm.getMenu().add("Set or Update Folder password");
             if(num > 0){
-                pm.getMenu().add("Delete password");
+                pm.getMenu().add("Delete Folder password");
             }
             //}else{
                // pm.getMenu().add("Set password").setEnabled(false);
@@ -322,7 +322,7 @@ public class Gallery extends BaseActivity implements EasyPermissions.PermissionC
                         return true;
                     }
 
-                    if(menuItem.getTitle() == "Set or Update password"){
+                    if(menuItem.getTitle() == "Set or Update Folder password"){
                         //if(num < 1){
                             startActivity(new Intent(Gallery.this,setPassGallery.class));
                         //}else{
@@ -332,7 +332,7 @@ public class Gallery extends BaseActivity implements EasyPermissions.PermissionC
                         return true;
                     }
 
-                    if(menuItem.getTitle() == "Delete password"){
+                    if(menuItem.getTitle() == "Delete Folder password"){
                         deletePass();
                         return true;
                     }
@@ -1030,7 +1030,7 @@ public class Gallery extends BaseActivity implements EasyPermissions.PermissionC
             Uri uri = UriList.get(i);
             String newUri = encrypt(uri.toString(), currentUser.getUid());
             //model = new UploadGallery(imgName, uri.toString());
-            model = new UploadGallery(imgName, newUri);
+            model = new UploadGallery(imgName, newUri, "");
             UploadGallery finalModel = model;
             db.collection("Gallery").document(currentUser.getUid()).collection("My Gallery").add(model).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                 @Override
@@ -1485,7 +1485,29 @@ public class Gallery extends BaseActivity implements EasyPermissions.PermissionC
 
     @Override
     public void onItemClick(int position) {
-        Toast.makeText(this, "Normal click at position: " + position, Toast.LENGTH_SHORT).show();
+        UploadGallery selectedItem = newarrayList.get(position);
+        String password = selectedItem.getPass();
+        if(password != ""){
+            Intent intent = new Intent(Gallery.this, enter_image_pass.class);
+            intent.putExtra("password", password);
+            intent.putExtra("image", selectedItem.getImageUrl());
+            intent.putExtra("docId", selectedItem.getDocId());
+            startActivity(intent);
+        }
+        else{
+            Intent intent = new Intent(Gallery.this, FullImage.class);
+            intent.putExtra("password", password);
+            intent.putExtra("image", selectedItem.getImageUrl());
+            intent.putExtra("docId", selectedItem.getDocId());
+            startActivity(intent);
+        }
+        //Toast.makeText(this, "Normal click at position: " + position, Toast.LENGTH_SHORT).show();
+
+        /*Intent intent = new Intent(Gallery.this, FullImage.class);
+
+        intent.putExtra("image", selectedItem.getImageUrl());
+        intent.putExtra("docId", selectedItem.getDocId());
+        startActivity(intent);*/
     }
 
     //Delete from storage
