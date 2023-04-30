@@ -6,13 +6,17 @@
 
 
 
-    <item android:id="@+id/menu_Search"
+   <!-- <item android:id="@+id/menu_Search"
         android:icon="@drawable/ic_baseline_search"
         android:title="Search"
-        app:showAsAction="ifRoom"/>
+        app:showAsAction="ifRoom"/> -->
 
     <item android:id="@+id/menu_Settings"
         android:title="Settings"
+        />
+
+    <item android:id="@+id/menu_faq"
+        android:title="FAQ"
         />
 
 

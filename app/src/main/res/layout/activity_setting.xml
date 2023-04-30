@@ -91,11 +91,7 @@
                 android:textColor="@color/black"
                 android:textSize="10sp"
                 />
-            <Switch
-                android:id="@+id/switch_AutoLock"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                />
+
 
             <View
                 android:layout_width="match_parent"
@@ -103,20 +99,6 @@
                 android:layout_marginTop="10dp"
                 android:background="@android:color/black"/>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:text="Add Secure folder to screen"
-                android:textColor="@color/black"
-                android:textSize="15sp"
-                />
-
-            <Switch
-                android:id="@+id/switch_AddtoScreen"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                />
 
 
 
