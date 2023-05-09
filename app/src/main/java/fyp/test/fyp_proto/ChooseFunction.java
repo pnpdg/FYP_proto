@@ -33,6 +33,8 @@ import com.google.firebase.firestore.FirebaseFirestore;
 public class ChooseFunction extends BaseActivity{
     private CardView noteBtn;
     private CardView  galleryBtn;
+    private CardView recoverBtn;
+
     private CardView profileBtn;
     // private Menu settingsBtn;
 
@@ -53,9 +55,11 @@ public class ChooseFunction extends BaseActivity{
 
         noteBtn = findViewById(R.id.Note_card);
         galleryBtn = findViewById(R.id.Gallery_card);
+        recoverBtn = findViewById(R.id.recover_card);
         profileBtn = findViewById(R.id.Profile_card);
       //  settingsBtn = findViewById(R.id.menu_Settings);
        logoutBtn = findViewById(R.id.ch_logout_btn);
+
 
         db = FirebaseFirestore.getInstance();
         currentUser = FirebaseAuth.getInstance().getCurrentUser();
@@ -92,6 +96,13 @@ public class ChooseFunction extends BaseActivity{
                 }else{
                     startActivity(new Intent(getApplicationContext(),enterPassGallery.class));
                 }
+            }
+        });
+
+        recoverBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(getApplicationContext(),PasswordResetMenu.class));
             }
         });
 
