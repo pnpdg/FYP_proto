@@ -7,6 +7,7 @@ public class Note {
     String content;
     String password;
     Timestamp timestamp;
+    String docID;
 
     public Note() {
 
@@ -43,4 +44,8 @@ public class Note {
     public void setTimestamp(Timestamp timestamp) {
         this.timestamp = timestamp;
     }
+
+    public String getID(){ return docID; }
+
+    public void setID(String id){ this.docID = id;}
 }

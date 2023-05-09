@@ -16,7 +16,6 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-//import com.bumptech.glide.Glide;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -105,9 +104,17 @@ public class RetrieveAdp extends RecyclerView.Adapter<RetrieveAdp.ViewHolder> {
             contextMenu.setHeaderTitle("Select Action");
             MenuItem delete = contextMenu.add(Menu.NONE, 1, 1, "Delete only");
             MenuItem delUnhide = contextMenu.add(Menu.NONE, 2, 2, "Delete and unhide");
+            int position = getAdapterPosition();
+            UploadGallery uploadCurrent = newarrayList.get(position);
+            if(uploadCurrent.getPass()!= ""){
+                MenuItem resetPass = contextMenu.add(Menu.NONE, 3, 3, "Reset password");
+                resetPass.setOnMenuItemClickListener(this);
+            }
 
             delete.setOnMenuItemClickListener(this);
             delUnhide.setOnMenuItemClickListener(this);
+            //resetPass.setOnMenuItemClickListener(this);
+
 
         }
 
@@ -123,6 +130,9 @@ public class RetrieveAdp extends RecyclerView.Adapter<RetrieveAdp.ViewHolder> {
                         case 2 :
                             mListener.onDelUnhideClick(position);
                             return true;
+                        case 3 :
+                            mListener.onResetPassClick(position);
+                            return true;
 
                     }
                 }
@@ -137,6 +147,8 @@ public class RetrieveAdp extends RecyclerView.Adapter<RetrieveAdp.ViewHolder> {
         void onDeleteClick(int position);
 
         void onDelUnhideClick(int position);
+
+        void onResetPassClick(int position);
     }
 
     public void setOnItemClickListener(OnItemClickListener listener){

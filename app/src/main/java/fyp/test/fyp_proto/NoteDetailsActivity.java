@@ -13,11 +13,14 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.SetOptions;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -120,6 +123,8 @@ public class NoteDetailsActivity extends BaseActivity {
         note.setContent(encContent);
         note.setPassword(notePassword);
         note.setTimestamp(Timestamp.now());
+        note.setID(docId);
+
 
         saveNoteToFirebase(note);
 
@@ -161,13 +166,46 @@ public class NoteDetailsActivity extends BaseActivity {
         if(isEditMode){
             //update note
             documentReference = Utility.getCollectionReferenceForNotes().document(docId);
+            documentReference.set(note).addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    if(task.isSuccessful()){
+                        //notes is added
+                        Utility.showToast(NoteDetailsActivity.this,"Note updated successfully");
+                        finish();
+                    }else{
+                        Utility.showToast(NoteDetailsActivity.this,"Failed while adding note");
 
+                    }
+                }
+            });
         }else{
             //create note
-            documentReference = Utility.getCollectionReferenceForNotes().document();
+            Note finalNote = note;
+            Utility.getCollectionReferenceForNotes().add(note).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                @Override
+                public void onSuccess(DocumentReference documentReference) {
+                    finalNote.setID(documentReference.getId());
+                    Utility.getCollectionReferenceForNotes().document(finalNote.getID())
+                            .set(finalNote, SetOptions.merge()).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void unused) {
+                                    Utility.showToast(NoteDetailsActivity.this,"Note added successfully");
+                                    finish();
+                                }
+                            });
+
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Utility.showToast(NoteDetailsActivity.this,"Failed while adding note");
+                    finish();
+                }
+            });
         }
 
-        documentReference.set(note).addOnCompleteListener(new OnCompleteListener<Void>() {
+        /*documentReference.set(note).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 if(task.isSuccessful()){
@@ -179,7 +217,7 @@ public class NoteDetailsActivity extends BaseActivity {
 
                 }
             }
-        });
+        });*/
     }
 
     void deleteNoteFromFirebase(){

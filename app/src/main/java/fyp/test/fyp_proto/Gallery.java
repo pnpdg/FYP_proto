@@ -28,6 +28,7 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.location.LocationManager;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -372,7 +373,7 @@ public class Gallery extends BaseActivity implements EasyPermissions.PermissionC
 
         cameraBtn.setOnClickListener(view->{
             //Define camera and storage permissions
-            String[] strings = {Manifest.permission.CAMERA};
+            String[] strings = {Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE};
             //Check condition
             if(EasyPermissions.hasPermissions(this,strings)){
                 takePicture();
@@ -707,10 +708,15 @@ public class Gallery extends BaseActivity implements EasyPermissions.PermissionC
                 //Get image from camera and start cropping
                 //Bitmap b = (Bitmap) data.getExtras().get("data");
                 //imageUri = getImageUri(this, b);
-                startCropActivity(imageUri);
-            } else if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+                //startCropActivity(imageUri);
+                /*ContentValues values = new ContentValues();
+                values.put(MediaStore.Images.Media.TITLE,"IMAGE_TITLE");
+                values.put(MediaStore.Images.Media.DESCRIPTION,"IMAGE_DETAIL");
+                imageUri = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,values);*/
+
+            } //else if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
                 //After confirming and clicking the crop button
-                CropImage.ActivityResult result = CropImage.getActivityResult(data);
+                //CropImage.ActivityResult result = CropImage.getActivityResult(data);
                 //if (resultCode == RESULT_OK) {
                 //imageUri = getImageUri(this,b);
                 //tempImgList.add(result.toString());
@@ -728,10 +734,10 @@ public class Gallery extends BaseActivity implements EasyPermissions.PermissionC
                 } catch (IOException e) {
                     e.printStackTrace();
                 }*/
-            } else if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
+            //} else if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
                 //For error handling
-                Toast.makeText(getApplicationContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
-            }
+                //Toast.makeText(getApplicationContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
+            //}
             //lastUpdatedList.addAll(arrayList);
             //Add the arraylist to main arraylist
             /*for(int i = 0; i< arrayList.size(); i++){
@@ -1584,6 +1590,14 @@ public class Gallery extends BaseActivity implements EasyPermissions.PermissionC
                         onDeleteClick(position);
                     }
                 });
+    }
+
+    @Override
+    public void onResetPassClick(int position) {
+        UploadGallery selectedItem = newarrayList.get(position);
+        Intent intent = new Intent(Gallery.this, ResetPassGalleryFile.class);
+        intent.putExtra("docId", selectedItem.getDocId());
+        startActivity(intent);
     }
 
     public void createImage(Context context, Bitmap bitmap){
