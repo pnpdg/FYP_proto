@@ -124,6 +124,12 @@ public class ChooseFunction extends BaseActivity{
             return true;
         }
 
+        if (id == R.id.menu_faq) {
+            Intent intent1 = new Intent(ChooseFunction.this,FAQ.class);
+            this.startActivity(intent1);
+            return true;
+        }
+
        // switch (item.getItemId()) {
 
            // case R.id.menu_Settings:
