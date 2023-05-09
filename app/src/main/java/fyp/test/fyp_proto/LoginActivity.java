@@ -20,6 +20,8 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.AggregateQuerySnapshot;
+import com.google.firebase.firestore.AggregateSource;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -103,8 +105,9 @@ public class LoginActivity extends AppCompatActivity {
                 }
 
                 if(documentSnapshot.getString("Role").equals("1")){
-                    startActivity(new Intent(getApplicationContext(),ChooseFunction.class));
-                    finish();
+                    checkQnsSet(uid);
+                    //startActivity(new Intent(getApplicationContext(),ChooseFunction.class));
+                    //finish();
                 }
             }
         });
@@ -201,5 +204,36 @@ public class LoginActivity extends AppCompatActivity {
     public void onBackPressed() {
         super.onBackPressed();
         finish(); // 액티비티 종료
+    }
+
+    /*public void checkQnsSet(String uid){
+        fStore.collection("Recovery").document(uid).collection("Security Qns").count()
+                .get(AggregateSource.SERVER).addOnCompleteListener(new OnCompleteListener<AggregateQuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AggregateQuerySnapshot> task) {
+                        if(task.isSuccessful()){
+                            AggregateQuerySnapshot snapshot = task.getResult();
+                            numGallery = snapshot.getCount();
+                            Log.i("Show number of entries in gallery pass", String.valueOf(numGallery));
+                        }
+                    }
+                });
+    }*/
+
+    public void checkQnsSet(String uid){
+        fStore.collection("Recovery").document(uid).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                if (documentSnapshot.exists()){
+                    startActivity(new Intent(getApplicationContext(),ChooseFunction.class));
+                    finish();
+                }
+                else{
+                    startActivity(new Intent(getApplicationContext(),AskSecurityQns.class));
+                    finish();
+                }
+            }
+        });
+
     }
 }
