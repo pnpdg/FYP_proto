@@ -14,10 +14,22 @@
         android:layout_marginBottom="0dp"
         android:text="Logout" />
 
+    <androidx.appcompat.widget.Toolbar
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/toolbar"
+        app:menu="@menu/menu_item"
+        android:background="?attr/colorPrimary"
+        android:minHeight="?attr/actionBarSize"
+        android:theme="?attr/actionBarTheme"
+        />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
         android:layout_height="678dp"
+        android:layout_below="@+id/toolbar"
         android:layout_above="@+id/logout_btn"
+
         android:layout_marginBottom="5dp" />
 </RelativeLayout>

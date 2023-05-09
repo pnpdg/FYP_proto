@@ -33,6 +33,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 public class ChooseFunction extends BaseActivity{
     private CardView noteBtn;
     private CardView  galleryBtn;
+    private CardView profileBtn;
     // private Menu settingsBtn;
 
     Button logoutBtn;
@@ -52,6 +53,7 @@ public class ChooseFunction extends BaseActivity{
 
         noteBtn = findViewById(R.id.Note_card);
         galleryBtn = findViewById(R.id.Gallery_card);
+        profileBtn = findViewById(R.id.Profile_card);
       //  settingsBtn = findViewById(R.id.menu_Settings);
        logoutBtn = findViewById(R.id.ch_logout_btn);
 
@@ -60,6 +62,13 @@ public class ChooseFunction extends BaseActivity{
 
         waitTask wt = new waitTask();
         wt.execute();
+
+        profileBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getApplicationContext(),UserProfile.class));
+            }
+        });
 
         noteBtn.setOnClickListener(new View.OnClickListener() {
             @Override
