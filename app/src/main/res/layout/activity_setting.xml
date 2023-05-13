@@ -87,7 +87,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
-                android:text="Lock automatically when screen turns off"
+                android:text="Lock automatically when screen turns off after 30 seconds idle"
                 android:textColor="@color/black"
                 android:textSize="10sp"
                 />
@@ -102,38 +102,9 @@
 
 
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:text="General"
-                android:textColor="@color/black"
-                android:textSize="18sp"
-                android:textStyle="bold" />
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginTop="10dp"
-                android:background="@android:color/black"/>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:autoLink="web"
-                android:id="@+id/PrivacyPolicy"
-                android:layout_centerInParent="true"
-                android:text="Privacy Policy"
-                android:layout_marginTop="10dp"
-                android:linksClickable="true"/>
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:autoLink="web"
-                android:id="@+id/AboutSecureFolder"
-                android:layout_centerInParent="true"
-                android:text="About Secure Folder"
-                android:layout_marginTop="10dp"
-                android:linksClickable="true"/>
+
+
 
 
 
