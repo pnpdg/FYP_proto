@@ -102,7 +102,7 @@ public class ResetPassGalleryFile extends AppCompatActivity {
     }
 
     public boolean validateAns(String qns1, String qns2, String qns3){
-        if(qns1.equals(ans1) && qns2.equals(ans2) && qns3.equals(ans3)){
+        if(qns1.trim().equals(ans1.trim()) && qns2.trim().equals(ans2.trim()) && qns3.trim().equals(ans3.trim())){
             return true;
         }
         else{
@@ -119,14 +119,12 @@ public class ResetPassGalleryFile extends AppCompatActivity {
     public void resetPass() {
         Map<String, Object> map = new HashMap<>();
         String pass = "";
-        //String decryptPass = decrypt(pass, currentUser.getUid());
         map.put("pass", pass);
         db.collection("Gallery").document(currentUser.getUid()).collection("My Gallery").document(documentId).update(map).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void unused) {
                 startActivity(new Intent(ResetPassGalleryFile.this,Gallery.class));
                 Toast.makeText(getApplicationContext(), "Password reset", Toast.LENGTH_SHORT).show();
-                //startActivity(new Intent(getApplicationContext(),Gallery.class));
             }
         });
     }

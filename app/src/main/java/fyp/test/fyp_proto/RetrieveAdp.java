@@ -23,10 +23,7 @@ import java.util.ArrayList;
 import jp.wasabeef.picasso.transformations.BlurTransformation;
 
 public class RetrieveAdp extends RecyclerView.Adapter<RetrieveAdp.ViewHolder> {
-    //Initialize variable
-    //ArrayList<UploadGallery> newarrayList;
     ArrayList<UploadGallery> newarrayList;
-    //ArrayList<Uri> normalList;
     private Context mContext;
     private OnItemClickListener mListener;
 
@@ -60,9 +57,6 @@ public class RetrieveAdp extends RecyclerView.Adapter<RetrieveAdp.ViewHolder> {
                     .into(holder.ivImage);
         }
 
-        //Glide.with(mContext).load(Uri.parse(newarrayList.get(position))).into(holder.ivImage);
-
-        //holder.ivImage.setImageURI(normalList.get(position));
         holder.textView.setText("Image No." + position);
 
     }
@@ -113,9 +107,6 @@ public class RetrieveAdp extends RecyclerView.Adapter<RetrieveAdp.ViewHolder> {
 
             delete.setOnMenuItemClickListener(this);
             delUnhide.setOnMenuItemClickListener(this);
-            //resetPass.setOnMenuItemClickListener(this);
-
-
         }
 
         @Override

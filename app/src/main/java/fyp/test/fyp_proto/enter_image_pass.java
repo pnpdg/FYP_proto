@@ -75,7 +75,6 @@ public class enter_image_pass extends AppCompatActivity {
     }
 
     public boolean verifyPass(String pass, String decrypted){
-        //String decryptedPass = fromFireStoreDecrypt();
         if(pass.equals(decrypted)){
             return true;
         }

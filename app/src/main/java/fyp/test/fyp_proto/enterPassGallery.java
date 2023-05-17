@@ -68,7 +68,6 @@ public class enterPassGallery extends BaseActivity {
     }
 
     public boolean verifyPass(String pass, String decrypted){
-        //String decryptedPass = fromFireStoreDecrypt();
         if(pass.equals(decrypted)){
             return true;
         }
@@ -134,35 +133,4 @@ public class enterPassGallery extends BaseActivity {
             return false;
         }
     }
-
-    /*class waitTask extends AsyncTask<Void, Void, Void> {
-
-        ProgressDialog pd;
-
-        @Override
-        protected void onPreExecute(){
-            super.onPreExecute();
-            pd = new ProgressDialog(enterPassGallery.this);
-            pd.show();
-        }
-
-        @Override
-        protected Void doInBackground(Void... voids) {
-            //verifyPass();
-
-            try {
-                Thread.sleep(4000);
-            }catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-
-            return null;
-        }
-        @Override
-        protected void onPostExecute(Void unused){
-
-            super.onPostExecute(unused);
-            pd.dismiss();
-        }
-    }*/
 }

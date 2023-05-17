@@ -83,7 +83,6 @@ public class ChooseFunction extends BaseActivity{
                 }else{
                     startActivity(new Intent(getApplicationContext(),enterPassNotes.class));
                 }
-                // finish();
             }
         });
 
@@ -140,15 +139,8 @@ public class ChooseFunction extends BaseActivity{
             return true;
         }
 
-       // switch (item.getItemId()) {
 
-           // case R.id.menu_Settings:
-              //  Toast.makeText(this, "Settings selected", Toast.LENGTH_SHORT).show();
-              //  return true;
-            //default:
-                return super.onOptionsItemSelected(item);
-       // }
-
+        return super.onOptionsItemSelected(item);
     }
 
 

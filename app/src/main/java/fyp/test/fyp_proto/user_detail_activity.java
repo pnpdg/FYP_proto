@@ -19,8 +19,8 @@ import java.util.Map;
 
 public class user_detail_activity extends AppCompatActivity {
 
-    EditText fullName, userEmail, Role;
-    TextView Uid;
+    EditText fullName, Role;
+    TextView Uid, userEmail;
     ImageButton saveUserBtn;
     String name,email,role,userId;
     FirebaseFirestore fStore;
@@ -101,27 +101,4 @@ public class user_detail_activity extends AppCompatActivity {
 
 
     }
-    /*
-    void saveUserToFireBase(User user){
-        // get current user
-        Toast.makeText(user_detail_activity.this,"User Detail Updated",Toast.LENGTH_SHORT).show();
-        // put current user uid
-        DocumentReference df = fStore.collection("Users").document(userId);
-        // store data
-        Map<String,Object> userInfo = new HashMap<>();
-        userInfo.put("FullName",user.FullName);
-        userInfo.put("UserEmail",user.UserEmail);
-        // specify if the user's role
-
-        userInfo.put("Role",7);
-        userInfo.put("uId",userId);
-
-        df.set(userInfo);
-
-        // go back to login activity
-        startActivity(new Intent(getApplicationContext(),AdminActivity.class));
-        finish();
-
-
-    }*/
 }

@@ -58,25 +58,21 @@ public class setPassGallery extends BaseActivity {
             public void onClick(View view) {
                 if (checkField(galleryPassText) == true){
                     String password = galleryPassText.getText().toString();
-                    //num = numOfPass();
                     if(num < 1){
                         try {
                             waitTask wt = new waitTask();
                             wt.execute();
-                            //toFireStore(password);
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
                     }else{
                         try {
                             updateFireStore(password);
-                            //toFireStore(password);
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
                     }
                 }
-                //finish();
             }
         });
 
@@ -122,7 +118,6 @@ public class setPassGallery extends BaseActivity {
                                     try {
                                         waitTask wt2 = new waitTask();
                                         wt2.execute();
-                                        //toFireStore(pass);
                                     } catch (Exception e) {
                                         e.printStackTrace();
                                     }

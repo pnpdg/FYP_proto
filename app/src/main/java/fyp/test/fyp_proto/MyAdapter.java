@@ -45,7 +45,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
             Intent intent = new Intent(context,user_detail_activity.class);
             intent.putExtra("FullName",user.FullName);
             intent.putExtra("UserEmail",user.UserEmail);
-            intent.putExtra("Role1",user.Role);
+            intent.putExtra("Role",user.Role);
             intent.putExtra("Uid",user.Uid);
             context.startActivity(intent);
         });

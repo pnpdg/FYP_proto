@@ -102,7 +102,7 @@ public class ResetPassNotesFile extends AppCompatActivity {
     }
 
     public boolean validateAns(String qns1, String qns2, String qns3){
-        if(qns1.equals(ans1) && qns2.equals(ans2) && qns3.equals(ans3)){
+        if(qns1.trim().equals(ans1.trim()) && qns2.trim().equals(ans2.trim()) && qns3.trim().equals(ans3.trim())){
             return true;
         }
         else{

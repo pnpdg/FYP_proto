@@ -6,8 +6,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class MyApp extends Application {
-    //public static final String SHARED_PREFS = "sharedPrefs";
-    //public static final String SWITCH1 = "switch1";
     private LogoutListener listener;
     private Timer timer;
 
@@ -19,7 +17,7 @@ public class MyApp extends Application {
             public void run() {
                 listener.onSessionLogout();
             }
-        }, 3000000);
+        }, 180000);
     }
 
     private void cancelTimer() {

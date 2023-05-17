@@ -159,7 +159,6 @@ public class UserProfile extends AppCompatActivity {
         // get current user
         Toast.makeText(UserProfile.this,"User Detail Updated",Toast.LENGTH_SHORT).show();
         // put current user uid
-        //DocumentReference docRef = db.collection("Users").document(currentUser.getUid());
         DocumentReference df = fStore.collection("Users").document(s);
         // store data
         Map<String,Object> userInfo = new HashMap<>();

@@ -87,7 +87,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
-                android:text="Lock automatically when screen turns off after 30 seconds idle"
+                android:text="Lock automatically when screen turns off after 3 minutes idle"
                 android:textColor="@color/black"
                 android:textSize="10sp"
                 />

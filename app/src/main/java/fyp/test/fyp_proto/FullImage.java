@@ -94,13 +94,11 @@ public class FullImage extends AppCompatActivity {
     public void deletePass() {
         Map<String, Object> map = new HashMap<>();
         String pass = "";
-        //String decryptPass = decrypt(pass, currentUser.getUid());
         map.put("pass", pass);
         db.collection("Gallery").document(currentUser.getUid()).collection("My Gallery").document(documentId).update(map).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void unused) {
                 Toast.makeText(getApplicationContext(), "Password deleted", Toast.LENGTH_SHORT).show();
-                //startActivity(new Intent(getApplicationContext(),Gallery.class));
             }
         });
     }

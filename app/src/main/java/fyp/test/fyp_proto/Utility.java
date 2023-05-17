@@ -23,12 +23,6 @@ public class Utility {
                 document(currentUser.getUid()).collection("my_notes");
     }
 
-//    static CollectionReference testGetCollectionReferenceForNotes(){
-//        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
-//        return (CollectionReference) FirebaseFirestore.getInstance().collection("notes").
-//                document(currentUser.getUid()).collection("my_notes").whereEqualTo("title","A");
-//    }
-
     static String timestampToString(Timestamp timestamp){
         return new SimpleDateFormat("MM/dd/yyyy").format(timestamp.toDate());
     }

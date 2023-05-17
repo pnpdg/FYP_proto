@@ -97,9 +97,6 @@ public class CreateAccountActivity extends AppCompatActivity {
             }
         });
 
-        //createAccountBtn.setOnClickListener(v-> createAccount());
-        //loginBtnTextView.setOnClickListener(v->finish());
-
         loginBtnTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -137,61 +134,4 @@ public class CreateAccountActivity extends AppCompatActivity {
 
         return valid;
     }
-
-    /*
-    void createAccount(){
-        String email = emailEditText.getText().toString();
-        String password = passwordEditText.getText().toString();
-        String confirmPassword = confirmPasswordEditText.getText().toString();
-
-        boolean isValidated  = validatedData(email,password,confirmPassword);
-        if(!isValidated){
-            return;
-        }
-
-        createAccountInFirebase(email,password);
-    }
-
-
-    void createAccountInFirebase(String email,String password){
-        changeInProgress(true);
-
-        FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
-        firebaseAuth.createUserWithEmailAndPassword(email,password).addOnCompleteListener(CreateAccountActivity.this,
-                new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        changeInProgress(false);
-
-                        if(task.isSuccessful()){
-                            //creating acc is done
-                            Utility.showToast(CreateAccountActivity.this,"Successfully create account,Check email to verify");
-//                            Toast.makeText(CreateAccountActivity.this,"Successfully create account,Check email to verify",Toast.LENGTH_SHORT).show();
-                            firebaseAuth.getCurrentUser().sendEmailVerification();
-                            firebaseAuth.signOut();
-                            finish();
-                        }else{
-                            //fail
-                            Utility.showToast(CreateAccountActivity.this,task.getException().getLocalizedMessage());
-//                            Toast.makeText(CreateAccountActivity.this,task.getException().getLocalizedMessage(),Toast.LENGTH_SHORT).show();
-
-                        }
-                    }
-                }
-        );
-
-    }
-
-
-    void changeInProgress(boolean inProgress){
-        if(inProgress){
-            progressBar.setVisibility(View.VISIBLE);
-            createAccountBtn.setVisibility(View.GONE);
-        }else{
-            progressBar.setVisibility(View.GONE);
-            createAccountBtn.setVisibility(View.VISIBLE);
-        }
-    }
-
-     */
 }

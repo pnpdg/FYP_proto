@@ -68,7 +68,6 @@ public class enterPassNotes extends BaseActivity {
     }
 
     public boolean verifyPass(String pass, String decrypted){
-        //String decryptedPass = fromFireStoreDecrypt();
         if(pass.equals(decrypted)){
             return true;
         }

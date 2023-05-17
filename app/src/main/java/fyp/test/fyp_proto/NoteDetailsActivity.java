@@ -39,6 +39,7 @@ public class NoteDetailsActivity extends BaseActivity {
     TextView deleteNoteTextViewBtn;
     FirebaseAuth fAuth;
     String AES = "AES";
+    String encryptPass;
 
 
     @Override
@@ -117,11 +118,17 @@ public class NoteDetailsActivity extends BaseActivity {
             return;
         }
 
+        try {
+            encryptPass = encrypt(notePassword, encryptionKey);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         Note note = new Note();
 
         note.setTitle(noteTitle);
         note.setContent(encContent);
-        note.setPassword(notePassword);
+        note.setPassword(encryptPass);
         note.setTimestamp(Timestamp.now());
         note.setID(docId);
 
@@ -204,20 +211,6 @@ public class NoteDetailsActivity extends BaseActivity {
                 }
             });
         }
-
-        /*documentReference.set(note).addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                if(task.isSuccessful()){
-                    //notes is added
-                    Utility.showToast(NoteDetailsActivity.this,"Note added successfully");
-                    finish();
-                }else{
-                    Utility.showToast(NoteDetailsActivity.this,"Failed while adding note");
-
-                }
-            }
-        });*/
     }
 
     void deleteNoteFromFirebase(){

@@ -82,10 +82,6 @@ public class LoginActivity extends AppCompatActivity {
                 startActivity(new Intent(getApplicationContext(),CreateAccountActivity.class));
             }
         });
-
-        //loginBtn.setOnClickListener(v-> loginUser());
-        //createAccountBtnTextView.setOnClickListener(v->startActivity(new Intent(LoginActivity.this,CreateAccountActivity.class)));
-
     }
 
     void checkUserAccessLevel(String uid){
@@ -106,8 +102,6 @@ public class LoginActivity extends AppCompatActivity {
 
                 if(documentSnapshot.getString("Role").equals("1")){
                     checkQnsSet(uid);
-                    //startActivity(new Intent(getApplicationContext(),ChooseFunction.class));
-                    //finish();
                 }
             }
         });
@@ -122,32 +116,6 @@ public class LoginActivity extends AppCompatActivity {
         }
 
         return valid;
-    }
-
-    /*
-    // check the login
-    @Override
-    protected void onStart() {
-        super.onStart();
-        if(FirebaseAuth.getInstance().getCurrentUser() != null){
-            startActivity(new Intent(getApplicationContext(),MainActivity.class));
-            finish()
-        }
-    }
-    */
-
-    void loginUser(){
-
-        String email = emailEditText.getText().toString();
-        String password = passwordEditText.getText().toString();
-
-        boolean isValidated  = validatedData(email,password);
-        if(!isValidated){
-            return;
-        }
-
-        loginAccountInFirebase(email,password);
-
     }
 
     void loginAccountInFirebase(String email,String password){
@@ -205,20 +173,6 @@ public class LoginActivity extends AppCompatActivity {
         super.onBackPressed();
         finish(); // 액티비티 종료
     }
-
-    /*public void checkQnsSet(String uid){
-        fStore.collection("Recovery").document(uid).collection("Security Qns").count()
-                .get(AggregateSource.SERVER).addOnCompleteListener(new OnCompleteListener<AggregateQuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AggregateQuerySnapshot> task) {
-                        if(task.isSuccessful()){
-                            AggregateQuerySnapshot snapshot = task.getResult();
-                            numGallery = snapshot.getCount();
-                            Log.i("Show number of entries in gallery pass", String.valueOf(numGallery));
-                        }
-                    }
-                });
-    }*/
 
     public void checkQnsSet(String uid){
         fStore.collection("Recovery").document(uid).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {

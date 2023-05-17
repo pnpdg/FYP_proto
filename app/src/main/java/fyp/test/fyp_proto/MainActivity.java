@@ -67,7 +67,7 @@ public class MainActivity extends BaseActivity implements NoteAdapter.OnItemClic
         //display menu
         PopupMenu popupMenu = new PopupMenu(MainActivity.this,menuBtn);
         popupMenu.getMenu().add("Main Page");
-        popupMenu.getMenu().add("Set or Update password");
+        popupMenu.getMenu().add("Set or Update Folder password");
         if(num > 0){
             popupMenu.getMenu().add("Delete password");
         }
